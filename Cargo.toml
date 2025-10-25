@@ -5,7 +5,7 @@ edition = "2024"
 description = "A Rust library for managing cryptocurrency accounts with mnemonic phrases and hierarchical deterministic wallets."
 license = "GPL-3.0-or-later"
 repository = "https://github.com/Free-Web-Movement/zz-rust-mod-account"
-keywords = ["cryptocurrency", "wallet", "mnemonic", "hd-wallet", "bitcoin", "rust", "android"]
+keywords = ["cryptocurrency", "wallet", "mnemonic", "web", "coin", "rust", "android"]
 authors = ["Eric <calidion@gmail.com>"]
 
 
