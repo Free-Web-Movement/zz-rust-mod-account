@@ -1,12 +1,12 @@
 use std::{ io::{ Read, Write }, path::{ Path, PathBuf } };
 
-use crate::address::FWMAddress;
+use crate::address::FreeWebMovementAddress;
 
 const DEFAULT_WALLET_DIR: &str = "./free-web-coin/wallets";
 const DEFAULT_WALLET_FILE: &str = "wallet.json";
 
 struct Wallet {
-    pub address: FWMAddress,
+    pub address: FreeWebMovementAddress,
     pub directory: String,
     pub filename: String,
 }
@@ -50,7 +50,7 @@ impl Wallet {
             serde_json::from_str(&contents).expect("钱包文件内容无效")
         } else {
             // 文件不存在则新建
-            let addr = FWMAddress::random();
+            let addr = FreeWebMovementAddress::random();
             let json = serde_json::to_string_pretty(&addr).expect("序列化钱包失败");
             let mut file = std::fs::File::create(&wallet_file).expect("无法创建钱包文件");
             file.write_all(json.as_bytes()).expect("无法写入钱包文件");

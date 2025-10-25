@@ -1,17 +1,17 @@
 use jni::objects::{ JClass, JString };
 use jni::sys::{ jlong };
 use jni::JNIEnv;
-use crate::address::FWMAddress;
+use crate::address::FreeWebMovementAddress;
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_create(_env: JNIEnv, _: JClass) -> jlong {
-    let addr = FWMAddress::random();
+    let addr = FreeWebMovementAddress::random();
     Box::into_raw(Box::new(addr)) as jlong
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_destroy(_env: JNIEnv, _: JClass, ptr: jlong) {
-    let _ = unsafe { Box::from_raw(ptr as *mut FWMAddress) };
+    let _ = unsafe { Box::from_raw(ptr as *mut FreeWebMovementAddress) };
 }
 
 #[unsafe(no_mangle)]
@@ -20,7 +20,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_prefix<'a>(
     _: JClass<'a>,
     ptr: jlong
 ) -> JString<'a> {
-    let address = unsafe { &mut *(ptr as *mut FWMAddress) };
+    let address = unsafe { &mut *(ptr as *mut FreeWebMovementAddress) };
 
     let prefix = env.new_string(&address.prefix).expect("Couldn't create Java string");
     prefix
@@ -32,7 +32,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_toString<'a>(
     _: JClass<'a>,
     ptr: jlong
 ) -> JString<'a> {
-    let address = unsafe { &mut *(ptr as *mut FWMAddress) };
+    let address = unsafe { &mut *(ptr as *mut FreeWebMovementAddress) };
 
     let str = env.new_string(&address.to_string()).expect("Couldn't create Java string");
     str
@@ -44,7 +44,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_privateKey<'a>(
     _: JClass<'a>,
     ptr: jlong
 ) -> JString<'a> {
-    let address = unsafe { &mut *(ptr as *mut FWMAddress) };
+    let address = unsafe { &mut *(ptr as *mut FreeWebMovementAddress) };
 
     let hex_string = hex::encode(&&address.private_key.to_bytes());
 
@@ -58,7 +58,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_publicKey<'a>(
     _: JClass<'a>,
     ptr: jlong
 ) -> JString<'a> {
-    let address = unsafe { &mut *(ptr as *mut FWMAddress) };
+    let address = unsafe { &mut *(ptr as *mut FreeWebMovementAddress) };
 
     let hex_string = hex::encode(&&address.public_key.to_bytes());
 
@@ -72,10 +72,10 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_toJSON<'a>(
     _: JClass<'a>,
     ptr: jlong
 ) -> JString<'a> {
-    let address = unsafe { &mut *(ptr as *mut FWMAddress) };
+    let address = unsafe { &mut *(ptr as *mut FreeWebMovementAddress) };
     let json = serde_json
         ::to_string_pretty(address)
-        .expect("Failed to serialize FWMAddress to JSON");
+        .expect("Failed to serialize FreeWebMovementAddress to JSON");
 
     let str = env.new_string(json.to_string()).expect("Couldn't create Java string");
     str
@@ -89,7 +89,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_fromJSON<'a>(
 ) -> jlong {
     let str = env.get_string(&json).expect("Couldn't get string from JString");
     let str = str.to_str().expect("Couldn't convert JString to str");
-    let addr = FWMAddress::from_json(&str).expect("Failed to deserialize FWMAddress from JSON");
+    let addr = FreeWebMovementAddress::from_json(&str).expect("Failed to deserialize FreeWebMovementAddress from JSON");
     Box::into_raw(Box::new(addr)) as jlong
 }
 

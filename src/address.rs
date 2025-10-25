@@ -41,7 +41,7 @@ pub struct AddressInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[repr(C)]
-pub struct FWMAddress {
+pub struct FreeWebMovementAddress {
     #[serde(with = "crate::address::serde_prefix")]
     pub prefix: String,
     #[serde(with = "crate::address::serde_mnemonic")]
@@ -143,7 +143,7 @@ pub mod serde_privkey {
 }
 
 #[allow(dead_code)]
-impl FWMAddress {
+impl FreeWebMovementAddress {
     pub fn new(mnemonic_info: MnemonicInfo, address_info_option: Option<AddressInfo>) -> Self {
         let mnemonic: Mnemonic;
         if mnemonic_info.phrase.is_empty() {
@@ -167,22 +167,22 @@ impl FWMAddress {
             prefix: COIN_PREFIX.to_string(),
         });
 
-        let seed: [u8; MNEMONIC_SEED_SIZE] = FWMAddress::mnemonic_to_seed(
+        let seed: [u8; MNEMONIC_SEED_SIZE] = FreeWebMovementAddress::mnemonic_to_seed(
             &mnemonic.clone(),
             &mnemonic_info.passphrase.clone()
         );
-        let (public_key, private_key) = FWMAddress::to_key_pair(
+        let (public_key, private_key) = FreeWebMovementAddress::to_key_pair(
             seed,
             &address_info.derivation_path,
             address_info.network
         ).unwrap();
-        let address = FWMAddress::key_to_inner_address(
+        let address = FreeWebMovementAddress::key_to_inner_address(
             public_key,
             address_info.network,
             address_info.address_type
         ).unwrap();
 
-        FWMAddress {
+        FreeWebMovementAddress {
             prefix: address_info.prefix,
             mnemonic,
             address,
@@ -257,7 +257,7 @@ impl FWMAddress {
             passphrase: String::new(),
         };
 
-        FWMAddress::new(mnemonic_info, None)
+        FreeWebMovementAddress::new(mnemonic_info, None)
     }
 
     pub fn save_to_file(&self, path: &str) -> io::Result<()> {
@@ -281,11 +281,11 @@ impl FWMAddress {
         let mut file = fs::File::open(path)?;
         let mut json = String::new();
         file.read_to_string(&mut json)?;
-        FWMAddress::from_json(&json)
+        FreeWebMovementAddress::from_json(&json)
     }
 }
 
-impl fmt::Display for FWMAddress {
+impl fmt::Display for FreeWebMovementAddress {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}:{}", self.prefix.to_string(), self.address.to_string())
     }
@@ -294,7 +294,7 @@ impl fmt::Display for FWMAddress {
 #[cfg(test)]
 mod tests {
     use crate::address::AddressInfo;
-    use crate::address::FWMAddress;
+    use crate::address::FreeWebMovementAddress;
     use crate::address::MnemonicInfo;
     use crate::address::COIN_PREFIX;
     use crate::address::DERIVATION_PATH;
@@ -374,13 +374,13 @@ mod tests {
             passphrase: String::new(),
         };
 
-        let fwmaddress = FWMAddress::new(mi_en.clone(), None);
-        let fwmaddress1 = FWMAddress::new(mi_en.clone(), None);
-        let fwmaddress2 = FWMAddress::new(mi_en.clone(), Some(ai1.clone()));
-        let fwmaddress3 = FWMAddress::new(mi_en_phrase, Some(ai2.clone()));
-        let fwmaddress4 = FWMAddress::new(mi_en_phrase1, Some(ai2.clone()));
-        let fwmaddress5 = FWMAddress::new(mi_en_phrase2, Some(ai2.clone()));
-        // let fwmaddress6 = FWMAddress::new(mi_en.clone(), Some(ai3.clone()));
+        let fwmaddress = FreeWebMovementAddress::new(mi_en.clone(), None);
+        let fwmaddress1 = FreeWebMovementAddress::new(mi_en.clone(), None);
+        let fwmaddress2 = FreeWebMovementAddress::new(mi_en.clone(), Some(ai1.clone()));
+        let fwmaddress3 = FreeWebMovementAddress::new(mi_en_phrase, Some(ai2.clone()));
+        let fwmaddress4 = FreeWebMovementAddress::new(mi_en_phrase1, Some(ai2.clone()));
+        let fwmaddress5 = FreeWebMovementAddress::new(mi_en_phrase2, Some(ai2.clone()));
+        // let fwmaddress6 = FreeWebMovementAddress::new(mi_en.clone(), Some(ai3.clone()));
         // assert!(fwmaddress6.is_err());
 
         assert_eq!(fwmaddress3.to_string(), fwmaddress4.to_string());
@@ -390,24 +390,24 @@ mod tests {
         println!("生成地址: {}", fwmaddress1.to_string());
         println!("生成地址: {}", fwmaddress2.to_string());
         println!("生成地址: {}", fwmaddress3.to_string());
-        println!("生成地址: {}", FWMAddress::random().to_string());
+        println!("生成地址: {}", FreeWebMovementAddress::random().to_string());
 
         let message = "Hello, FWM!".as_bytes();
-        let signature = FWMAddress::sign_message(&fwmaddress.private_key, message);
-        let is_valid = FWMAddress::verify_message(&fwmaddress.public_key, message, &signature);
+        let signature = FreeWebMovementAddress::sign_message(&fwmaddress.private_key, message);
+        let is_valid = FreeWebMovementAddress::verify_message(&fwmaddress.public_key, message, &signature);
         assert!(is_valid, "签名验证失败!");
     }
 
     #[test]
     fn test_fwmaddress_serde() {
-        let fwmaddress = FWMAddress::random();
+        let fwmaddress = FreeWebMovementAddress::random();
 
         // 序列化为 JSON
         let json = serde_json::to_string(&fwmaddress).expect("序列化失败");
-        println!("FWMAddress JSON: {}", json);
+        println!("FreeWebMovementAddress JSON: {}", json);
 
         // 反序列化回对象
-        let fwmaddress2: FWMAddress = serde_json::from_str(&json).expect("反序列化失败");
+        let fwmaddress2: FreeWebMovementAddress = serde_json::from_str(&json).expect("反序列化失败");
 
         // 关键字段应一致
         assert_eq!(fwmaddress.to_string(), fwmaddress2.to_string());
@@ -420,10 +420,10 @@ mod tests {
 
     #[test]
     fn test_save_and_load_fwmaddress() {
-        let fwmaddress = FWMAddress::random();
+        let fwmaddress = FreeWebMovementAddress::random();
         let path = "/tmp/fwmaddress.json";
         fwmaddress.save_to_file(path).expect("保存失败");
-        let loaded = FWMAddress::load_from_file(path).expect("读取失败");
+        let loaded = FreeWebMovementAddress::load_from_file(path).expect("读取失败");
         assert_eq!(fwmaddress.to_string(), loaded.to_string());
         assert_eq!(fwmaddress.public_key, loaded.public_key);
         assert_eq!(fwmaddress.private_key, loaded.private_key);
