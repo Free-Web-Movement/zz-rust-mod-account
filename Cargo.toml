@@ -1,0 +1,45 @@
+[package]
+name = "zz-account"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bip39 = { version = "2.2.0", features = ["rand", "all-languages"] }
+bitcoin = "0.31"
+secp256k1 = { version = "0.28", features = ["rand"] }
+hmac = "0.12"
+sha2 = "0.10"
+pbkdf2 = "0.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hex = "0.4"
+dirs = "5"
+jni = { version = "0.21.1", features = ["invocation"] }
+
+[dev-dependencies]
+
+[lib]
+# This must contain at least cdylib for Android libraries to be generated.
+crate-type = ["cdylib"]
+
+# If you want your Android docs to appear on docs.rs, add one of the Android
+# triplets like this:
+[package.metadata.docs.rs]
+targets = [
+    "aarch64-linux-android",
+    "armv7-linux-androideabi",
+    "i686-linux-android",
+    "x86_64-linux-android",
+    "x86_64-apple-darwin",
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu",
+]
+
+# An example of a custom profile
+[profile.release-space-optimized]
+inherits = "release"
+strip = true # Automatically strip symbols from the binary.
+opt-level = "z" # Optimize for size.
+lto = true # Enable link time optimization
+codegen-units = 1 # Reduce parallel code generation units
+panic = "abort"
