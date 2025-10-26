@@ -270,9 +270,7 @@ impl FreeWebMovementAddress {
     }
 
     pub fn from_json(json: &str) -> io::Result<Self> {
-        let addr = serde_json
-            ::from_str(json)
-            .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+        let addr = serde_json::from_str(json).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
         Ok(addr)
     }
 
@@ -296,14 +294,14 @@ mod tests {
     use crate::address::AddressInfo;
     use crate::address::FreeWebMovementAddress;
     use crate::address::MnemonicInfo;
-    use crate::address::COIN_PREFIX;
-    use crate::address::DERIVATION_PATH;
-    use crate::address::MNEMONIC_WORD_COUNT;
+    // use crate::address::COIN_PREFIX;
+    // use crate::address::DERIVATION_PATH;
+    // use crate::address::MNEMONIC_WORD_COUNT;
     use bip39::Language;
     use bip39::Mnemonic;
     use bitcoin::AddressType;
     use bitcoin::Network;
-
+    use crate::basic::*;
     #[test]
     fn it_should_generate() {
         let mi_en: MnemonicInfo = MnemonicInfo {
@@ -394,7 +392,11 @@ mod tests {
 
         let message = "Hello, FWM!".as_bytes();
         let signature = FreeWebMovementAddress::sign_message(&fwmaddress.private_key, message);
-        let is_valid = FreeWebMovementAddress::verify_message(&fwmaddress.public_key, message, &signature);
+        let is_valid = FreeWebMovementAddress::verify_message(
+            &fwmaddress.public_key,
+            message,
+            &signature
+        );
         assert!(is_valid, "签名验证失败!");
     }
 
@@ -407,7 +409,9 @@ mod tests {
         println!("FreeWebMovementAddress JSON: {}", json);
 
         // 反序列化回对象
-        let fwmaddress2: FreeWebMovementAddress = serde_json::from_str(&json).expect("反序列化失败");
+        let fwmaddress2: FreeWebMovementAddress = serde_json
+            ::from_str(&json)
+            .expect("反序列化失败");
 
         // 关键字段应一致
         assert_eq!(fwmaddress.to_string(), fwmaddress2.to_string());
@@ -431,5 +435,21 @@ mod tests {
         assert_eq!(fwmaddress.address, loaded.address);
         // 清理
         let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    fn test_basics() {
+        println!("MAX_HUMAN_POPULATION: {}", MAX_HUMAN_POPULATION);
+        println!("AVERAGE_ASSETS_PER_ONE_IN_USD: {}", AVERAGE_ASSETS_PER_USER_AS_IN_USD);
+        println!("MAX_COIN_SUPPLY: {}", MAX_COIN_SUPPLY);
+        println!("COIN_NAME: {}", COIN_NAME);
+        println!("COIN_SYMBOL: {}", COIN_SYMBOL);
+        println!("COIN_DECIMALS: {}", COIN_DECIMALS);
+        assert_eq!(MAX_HUMAN_POPULATION, 10_000_000_000);
+        assert_eq!(AVERAGE_ASSETS_PER_USER_AS_IN_USD, 1_000_000);
+        assert_eq!(MAX_COIN_SUPPLY, MAX_HUMAN_POPULATION * AVERAGE_ASSETS_PER_USER_AS_IN_USD * 100); // 10 trillion USD
+        assert_eq!(COIN_NAME, "Free Web Movement Coin - Zero Trust Zero Governance");
+        assert_eq!(COIN_SYMBOL, "FWMC-ZZ");
+        assert_eq!(COIN_DECIMALS, 8); // 1 ZZC = 0.00000001 USD
     }
 }
