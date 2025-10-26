@@ -2,10 +2,10 @@ use std::{ io::{ Read, Write }, path::{ Path, PathBuf } };
 
 use crate::address::FreeWebMovementAddress;
 
-const DEFAULT_WALLET_DIR: &str = "./free-web-coin/wallets";
+const DEFAULT_WALLET_DIR: &str = ".free-web-movement/account/wallets";
 const DEFAULT_WALLET_FILE: &str = "wallet.json";
 
-struct Wallet {
+pub struct Wallet {
     pub address: FreeWebMovementAddress,
     pub directory: String,
     pub filename: String,

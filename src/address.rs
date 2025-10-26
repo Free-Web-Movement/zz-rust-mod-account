@@ -285,7 +285,7 @@ impl FreeWebMovementAddress {
 
 impl fmt::Display for FreeWebMovementAddress {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}:{}", self.prefix.to_string(), self.address.to_string())
+        write!(f, "{}:{}", self.prefix, self.address)
     }
 }
 
@@ -453,3 +453,5 @@ mod tests {
         assert_eq!(COIN_DECIMALS, 8); // 1 ZZC = 0.00000001 USD
     }
 }
+
+
