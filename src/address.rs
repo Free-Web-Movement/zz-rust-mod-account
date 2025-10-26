@@ -49,9 +49,9 @@ pub struct FreeWebMovementAddress {
     #[serde(with = "crate::address::serde_address")]
     address: Address,
     #[serde(with = "crate::address::serde_pubkey")]
-    pub(crate) public_key: PublicKey,
+    pub public_key: PublicKey,
     #[serde(with = "crate::address::serde_privkey")]
-    pub(crate) private_key: PrivateKey,
+    pub private_key: PrivateKey,
 }
 
 pub mod serde_prefix {
