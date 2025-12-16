@@ -266,6 +266,10 @@ impl FreeWebMovementAddress {
         PrivateKey::from_slice(&bytes, Network::Bitcoin).unwrap()
     }
 
+    pub fn to_signature(bytes: &Vec<u8>) -> Signature {
+        Signature::from_compact(&bytes).unwrap()
+    }
+
     pub fn random() -> Self {
         let mnemonic_info = MnemonicInfo {
             language: Language::English,
@@ -319,6 +323,7 @@ mod tests {
     use bip39::Mnemonic;
     use bitcoin::AddressType;
     use bitcoin::Network;
+    use jni::signature;
     #[test]
     fn it_should_generate() {
         let mi_en: MnemonicInfo = MnemonicInfo {
@@ -450,6 +455,12 @@ mod tests {
         let bytes = fwmaddress.private_key.to_bytes();
         let private_key = FreeWebMovementAddress::to_private_key(&bytes);
         assert_eq!(fwmaddress.private_key.to_string(), private_key.to_string());
+
+        let signature = FreeWebMovementAddress::sign_message(&private_key, &[0,1,2]);
+        let bytes = signature.serialize_compact();
+        let signature1 = FreeWebMovementAddress::to_signature(&bytes.to_vec());
+        assert_eq!(signature.to_string(), signature1.to_string());
+
     }
 
     #[test]
