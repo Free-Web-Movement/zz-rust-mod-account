@@ -1,6 +1,6 @@
 [package]
 name = "zz-account"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2024"
 description = "A Rust library for managing cryptocurrency accounts with mnemonic phrases and hierarchical deterministic wallets."
 license = "GPL-3.0-or-later"
