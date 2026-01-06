@@ -1,4 +1,4 @@
-use std::{ io::{ Read, Write }, path::{ Path, PathBuf } };
+use std::{ io::{ Read, Write }, path:: PathBuf  };
 
 use crate::{ address::FreeWebMovementAddress, consts::{ DEFAULT_WALLET_DIR, DEFAULT_WALLET_FILE } };
 
@@ -48,6 +48,7 @@ impl Wallet {
             let mut file = std::fs::File::open(&wallet_file).expect("无法打开钱包文件");
             let mut contents = String::new();
             file.read_to_string(&mut contents).expect("无法读取钱包文件");
+            println!("reading wallet : {:?}", wallet_file);
             serde_json::from_str(&contents).expect("钱包文件内容无效")
         } else {
             let addr = FreeWebMovementAddress::random();
@@ -196,8 +197,8 @@ mod tests {
         // 清理
         let _ = fs::remove_dir_all(test_dir);
 
-        let wallet1 = Wallet::new(None, None);
-        let wallet2 = Wallet::new(Some(DEFAULT_WALLET_DIR), None);
+        // let wallet1 = Wallet::new(None, None);
+        // let wallet2 = Wallet::new(Some(DEFAULT_WALLET_DIR), None);
     }
 
     

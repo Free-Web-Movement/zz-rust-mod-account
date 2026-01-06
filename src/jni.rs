@@ -35,7 +35,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_prefix<'a>(
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
-    let prefix = env.new_string(&address.prefix).expect("Couldn't create Java string");
+    let prefix = env.new_string(&address.info.prefix).expect("Couldn't create Java string");
     prefix
 }
 
