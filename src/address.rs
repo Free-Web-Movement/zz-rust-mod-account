@@ -12,7 +12,7 @@ use std::str::FromStr;
 
 use serde::{ Serialize, Deserialize };
 
-use crate::basic::{
+use crate::consts::{
     COIN_PREFIX,
     DERIVATION_PATH,
     MNEMONIC_SEED_ROUNDS,
@@ -45,9 +45,9 @@ pub struct FreeWebMovementAddress {
     #[serde(with = "crate::address::serde_prefix")]
     pub prefix: String,
     #[serde(with = "crate::address::serde_mnemonic")]
-    mnemonic: Mnemonic,
+    pub mnemonic: Mnemonic,
     #[serde(with = "crate::address::serde_address")]
-    address: Address,
+    pub address: Address,
     #[serde(with = "crate::address::serde_pubkey")]
     pub public_key: PublicKey,
     #[serde(with = "crate::address::serde_privkey")]
@@ -301,7 +301,7 @@ mod tests {
     use bip39::Mnemonic;
     use bitcoin::AddressType;
     use bitcoin::Network;
-    use crate::basic::*;
+    use crate::consts::*;
     #[test]
     fn it_should_generate() {
         let mi_en: MnemonicInfo = MnemonicInfo {

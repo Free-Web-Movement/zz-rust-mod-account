@@ -12,3 +12,5 @@ pub const MNEMONIC_SEED_SIZE: usize = 64; // 默认的种子大小
 pub const MNEMONIC_SEED_ROUNDS: u32 = 2048; // 默认的种子的轮数
 
 pub const COIN_PREFIX: &str = "FWMC:Zz"; // 加密币前缀: FWM for Free Web Movement, Zz for Zero Trust, Zero Governance
+pub const DEFAULT_WALLET_DIR: &str = ".free-web-movement/account/wallets";
+pub const DEFAULT_WALLET_FILE: &str = "wallet.json";
