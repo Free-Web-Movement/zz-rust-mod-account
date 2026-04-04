@@ -1,4 +1,4 @@
-use std::io::{ self, Write };
+use std::io::{self, Write};
 use zz_account::wallet::Wallet;
 
 pub fn run_repl() {

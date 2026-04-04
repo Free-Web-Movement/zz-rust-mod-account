@@ -2,18 +2,16 @@ use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 
-use chrono::Local;
-use jni::objects::{ JClass, JString };
-use jni::sys::{ jlong };
-use jni::JNIEnv;
 use crate::address::FreeWebMovementAddress;
+use chrono::Local;
+use jni::JNIEnv;
+use jni::objects::{JClass, JString};
+use jni::sys::jlong;
 
 #[inline(always)]
 fn get_address_mut(ptr: jlong) -> &'static mut FreeWebMovementAddress {
     // 将 jlong 指针安全转换为 Rust 可用的可变引用
-    unsafe {
-        &mut *(ptr as *mut FreeWebMovementAddress)
-    }
+    unsafe { &mut *(ptr as *mut FreeWebMovementAddress) }
 }
 
 #[unsafe(no_mangle)]
@@ -31,11 +29,13 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_destroy(_env: JNIEnv, _: J
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_prefix<'a>(
     env: JNIEnv<'a>,
     _: JClass<'a>,
-    ptr: jlong
+    ptr: jlong,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
-    let prefix = env.new_string(&address.info.prefix).expect("Couldn't create Java string");
+    let prefix = env
+        .new_string(&address.info.prefix)
+        .expect("Couldn't create Java string");
     prefix
 }
 
@@ -43,11 +43,13 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_prefix<'a>(
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_toString<'a>(
     env: JNIEnv<'a>,
     _: JClass<'a>,
-    ptr: jlong
+    ptr: jlong,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
-    let str = env.new_string(&address.to_string()).expect("Couldn't create Java string");
+    let str = env
+        .new_string(&address.to_string())
+        .expect("Couldn't create Java string");
     str
 }
 
@@ -55,13 +57,15 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_toString<'a>(
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_privateKey<'a>(
     env: JNIEnv<'a>,
     _: JClass<'a>,
-    ptr: jlong
+    ptr: jlong,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
     let hex_string = hex::encode(&&address.private_key.to_bytes());
 
-    let str = env.new_string(hex_string.to_string()).expect("Couldn't create Java string");
+    let str = env
+        .new_string(hex_string.to_string())
+        .expect("Couldn't create Java string");
     str
 }
 
@@ -69,13 +73,15 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_privateKey<'a>(
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_publicKey<'a>(
     env: JNIEnv<'a>,
     _: JClass<'a>,
-    ptr: jlong
+    ptr: jlong,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
     let hex_string = hex::encode(&&address.public_key.to_bytes());
 
-    let str = env.new_string(hex_string.to_string()).expect("Couldn't create Java string");
+    let str = env
+        .new_string(hex_string.to_string())
+        .expect("Couldn't create Java string");
     str
 }
 
@@ -83,14 +89,15 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_publicKey<'a>(
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_toJSON<'a>(
     env: JNIEnv<'a>,
     _: JClass<'a>,
-    ptr: jlong
+    ptr: jlong,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
-    let json = serde_json
-        ::to_string_pretty(address)
+    let json = serde_json::to_string_pretty(address)
         .expect("Failed to serialize FreeWebMovementAddress to JSON");
 
-    let str = env.new_string(json.to_string()).expect("Couldn't create Java string");
+    let str = env
+        .new_string(json.to_string())
+        .expect("Couldn't create Java string");
     str
 }
 
@@ -98,13 +105,14 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_toJSON<'a>(
 pub unsafe extern "system" fn Java_rs_zz_coin_Address_fromJSON<'a>(
     mut env: JNIEnv<'a>,
     _: JClass<'a>,
-    json: JString
+    json: JString,
 ) -> jlong {
-    let str = env.get_string(&json).expect("Couldn't get string from JString");
+    let str = env
+        .get_string(&json)
+        .expect("Couldn't get string from JString");
     let str = str.to_str().expect("Couldn't convert JString to str");
-    let addr = FreeWebMovementAddress::from_json(&str).expect(
-        "Failed to deserialize FreeWebMovementAddress from JSON"
-    );
+    let addr = FreeWebMovementAddress::from_json(&str)
+        .expect("Failed to deserialize FreeWebMovementAddress from JSON");
     Box::into_raw(Box::new(addr)) as jlong
 }
 
@@ -113,7 +121,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_save<'a>(
     mut env: JNIEnv<'a>,
     _: JClass<'a>,
     ptr: jlong,
-    path: JString<'a>
+    path: JString<'a>,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
@@ -138,7 +146,8 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_save<'a>(
     let mut file = fs::File::create(&pathbuf).expect("无法创建钱包文件");
     file.write_all(json.as_bytes()).expect("写入失败");
 
-    env.new_string(pathbuf.to_string_lossy().to_string()).expect("无法创建返回字符串")
+    env.new_string(pathbuf.to_string_lossy().to_string())
+        .expect("无法创建返回字符串")
 }
 
 #[unsafe(no_mangle)]
@@ -146,7 +155,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_load<'a>(
     mut env: JNIEnv<'a>,
     _: JClass<'a>,
     ptr: jlong,
-    path: JString<'a>
+    path: JString<'a>,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
@@ -164,7 +173,8 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_load<'a>(
     let json = fs::read_to_string(&pathbuf).expect("读取文件失败");
     *address = serde_json::from_str(&json).expect("反序列化失败");
 
-    env.new_string(pathbuf.to_string_lossy().to_string()).expect("无法创建返回字符串")
+    env.new_string(pathbuf.to_string_lossy().to_string())
+        .expect("无法创建返回字符串")
 }
 
 #[unsafe(no_mangle)]
@@ -172,7 +182,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_backup<'a>(
     mut env: JNIEnv<'a>,
     _: JClass<'a>,
     ptr: jlong,
-    path: JString<'a>
+    path: JString<'a>,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
@@ -198,7 +208,8 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_backup<'a>(
     let mut file = fs::File::create(&pathbuf).expect("无法创建备份文件");
     file.write_all(json.as_bytes()).expect("写入失败");
 
-    env.new_string(pathbuf.to_string_lossy().to_string()).expect("无法创建返回字符串")
+    env.new_string(pathbuf.to_string_lossy().to_string())
+        .expect("无法创建返回字符串")
 }
 
 #[unsafe(no_mangle)]
@@ -206,7 +217,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_recovery<'a>(
     mut env: JNIEnv<'a>,
     _: JClass<'a>,
     ptr: jlong,
-    path: JString<'a>
+    path: JString<'a>,
 ) -> JString<'a> {
     let address = get_address_mut(ptr);
 
@@ -216,8 +227,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_recovery<'a>(
         // 默认恢复使用 app_data 下最新的 backup_*.json
         let mut dir = dirs::data_dir().expect("无法获取 app_data");
         dir.push(""); // data_dir 本身就是目录
-        let mut backups: Vec<PathBuf> = fs
-            ::read_dir(&dir)
+        let mut backups: Vec<PathBuf> = fs::read_dir(&dir)
             .unwrap()
             .filter_map(|entry| {
                 let entry = entry.ok()?;
@@ -238,14 +248,15 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_recovery<'a>(
     let json = fs::read_to_string(&pathbuf).expect("读取备份文件失败");
     *address = serde_json::from_str(&json).expect("反序列化失败");
 
-    env.new_string(pathbuf.to_string_lossy().to_string()).expect("无法创建返回字符串")
+    env.new_string(pathbuf.to_string_lossy().to_string())
+        .expect("无法创建返回字符串")
 }
 
 #[test]
 fn test_create_address() {
+    use crate::consts::COIN_PREFIX;
     use jni::InitArgsBuilder;
     use jni::JavaVM;
-    use crate::consts::COIN_PREFIX;
 
     let jvm_args = InitArgsBuilder::new().build().unwrap();
     let jvm = JavaVM::new(jvm_args).unwrap();
@@ -402,22 +413,22 @@ fn test_create_address() {
     assert!(PathBuf::from(&backup_path).exists());
     println!("Backup file: {}", backup_path);
 
-        // recovery 测试
-        let recovered_path = unsafe {
-            let class = JClass::default();
+    // recovery 测试
+    let recovered_path = unsafe {
+        let class = JClass::default();
 
-            let env = jvm.attach_current_thread_permanently().unwrap();
-            let java_path = env.new_string(&backup_path).unwrap();
-            let jstr = Java_rs_zz_coin_Address_recovery(env, class, address_ptr, java_path);
+        let env = jvm.attach_current_thread_permanently().unwrap();
+        let java_path = env.new_string(&backup_path).unwrap();
+        let jstr = Java_rs_zz_coin_Address_recovery(env, class, address_ptr, java_path);
 
-            let mut env = jvm.attach_current_thread_permanently().unwrap();
-            env.get_string(&jstr).unwrap().to_str().unwrap().to_string()
-        };
-        assert_eq!(recovered_path, backup_path);
+        let mut env = jvm.attach_current_thread_permanently().unwrap();
+        env.get_string(&jstr).unwrap().to_str().unwrap().to_string()
+    };
+    assert_eq!(recovered_path, backup_path);
 
-        // 清理
-        let _ = fs::remove_dir_all(&tmp_dir);
-        let _ = fs::remove_file(&backup_path);
+    // 清理
+    let _ = fs::remove_dir_all(&tmp_dir);
+    let _ = fs::remove_file(&backup_path);
 
     unsafe {
         let class = JClass::default();

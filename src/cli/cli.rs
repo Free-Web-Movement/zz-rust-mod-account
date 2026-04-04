@@ -1,4 +1,4 @@
-use clap::{ Parser, Subcommand };
+use clap::{Parser, Subcommand};
 use zz_account::wallet::Wallet;
 
 #[derive(Parser)]

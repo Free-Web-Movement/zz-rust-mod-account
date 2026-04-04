@@ -1,6 +1,12 @@
-use std::{ io::{ Read, Write }, path:: PathBuf  };
+use std::{
+    io::{Read, Write},
+    path::PathBuf,
+};
 
-use crate::{ address::FreeWebMovementAddress, consts::{ DEFAULT_WALLET_DIR, DEFAULT_WALLET_FILE } };
+use crate::{
+    address::FreeWebMovementAddress,
+    consts::{DEFAULT_WALLET_DIR, DEFAULT_WALLET_FILE},
+};
 
 pub struct Wallet {
     pub address: FreeWebMovementAddress,
@@ -47,7 +53,8 @@ impl Wallet {
         let address = if wallet_file.exists() {
             let mut file = std::fs::File::open(&wallet_file).expect("无法打开钱包文件");
             let mut contents = String::new();
-            file.read_to_string(&mut contents).expect("无法读取钱包文件");
+            file.read_to_string(&mut contents)
+                .expect("无法读取钱包文件");
             println!("reading wallet : {:?}", wallet_file);
             serde_json::from_str(&contents).expect("钱包文件内容无效")
         } else {
@@ -85,7 +92,7 @@ impl Wallet {
         self.address = serde_json::from_str(&contents)?;
         Ok(())
     }
-   /// backup: 在指定路径生成 JSON，只保存 address
+    /// backup: 在指定路径生成 JSON，只保存 address
     /// 如果 path 为 None，则在 Wallet 的默认目录生成带时间戳的文件
     pub fn backup(&self, path: Option<&str>) -> std::io::Result<String> {
         // 生成 JSON 字符串
@@ -139,7 +146,9 @@ impl Wallet {
                     .filter_map(|e| e.ok())
                     .filter(|e| {
                         e.file_type().map(|ft| ft.is_file()).unwrap_or(false)
-                            && e.file_name().to_string_lossy().starts_with("wallet_backup_")
+                            && e.file_name()
+                                .to_string_lossy()
+                                .starts_with("wallet_backup_")
                             && e.file_name().to_string_lossy().ends_with(".json")
                     })
                     .collect();
@@ -201,7 +210,6 @@ mod tests {
         // let wallet2 = Wallet::new(Some(DEFAULT_WALLET_DIR), None);
     }
 
-    
     #[test]
     fn test_wallet_create_save_load_backup_recovery_with_paths() {
         // 临时目录，避免污染真实钱包
@@ -231,9 +239,7 @@ mod tests {
         assert!(PathBuf::from(&backup_file_abs).exists());
 
         // 5. backup 默认路径
-        let backup_file_default = loaded_wallet
-            .backup(None)
-            .expect("默认路径备份失败");
+        let backup_file_default = loaded_wallet.backup(None).expect("默认路径备份失败");
         assert!(PathBuf::from(&backup_file_default).exists());
 
         // 6. recovery 指定绝对路径
