@@ -17,7 +17,10 @@ pub struct Wallet {
 impl Wallet {
     pub fn new(directory: Option<&str>, filename: Option<&str>) -> Self {
         // 获取用户 AppData 目录（Windows / macOS / Linux）
-        let mut dir = dirs::data_dir().expect("无法获取用户 AppData 目录");
+        let mut dir = dirs::data_dir().unwrap_or_else(|| {
+            tracing::warn!("Cannot determine app data directory, falling back to current directory");
+            PathBuf::from(".")
+        });
 
         match directory {
             Some(dir_str) => {
@@ -37,7 +40,7 @@ impl Wallet {
 
         // 检查目录是否存在，不存在则创建
         if !dir.exists() {
-            std::fs::create_dir_all(&dir).expect("无法创建钱包目录");
+            std::fs::create_dir_all(&dir).expect("Failed to create wallet directory");
         }
 
         let filename = filename.unwrap_or(DEFAULT_WALLET_FILE).to_string();
@@ -46,22 +49,22 @@ impl Wallet {
 
         // 确保文件的父目录存在
         if let Some(parent) = wallet_file.parent() {
-            std::fs::create_dir_all(parent).expect("无法创建钱包文件父目录");
+            std::fs::create_dir_all(parent).expect("Failed to create wallet parent directory");
         }
 
         // 如果文件存在则读取，否则新建随机地址
         let address = if wallet_file.exists() {
-            let mut file = std::fs::File::open(&wallet_file).expect("无法打开钱包文件");
+            let mut file = std::fs::File::open(&wallet_file).expect("Failed to open wallet file");
             let mut contents = String::new();
             file.read_to_string(&mut contents)
-                .expect("无法读取钱包文件");
-            println!("reading wallet : {:?}", wallet_file);
-            serde_json::from_str(&contents).expect("钱包文件内容无效")
+                .expect("Failed to read wallet file");
+            tracing::info!("reading wallet : {:?}", wallet_file);
+            serde_json::from_str(&contents).expect("Failed to parse wallet file contents")
         } else {
             let addr = FreeWebMovementAddress::random();
-            let json = serde_json::to_string_pretty(&addr).expect("序列化钱包失败");
-            let mut file = std::fs::File::create(&wallet_file).expect("无法创建钱包文件");
-            file.write_all(json.as_bytes()).expect("无法写入钱包文件");
+            let json = serde_json::to_string_pretty(&addr).expect("Failed to serialize wallet");
+            let mut file = std::fs::File::create(&wallet_file).expect("Failed to create wallet file");
+            file.write_all(json.as_bytes()).expect("Failed to write wallet file");
             addr
         };
 

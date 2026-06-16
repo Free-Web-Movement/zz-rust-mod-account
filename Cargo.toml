@@ -22,6 +22,7 @@ dirs = "5"
 jni = { version = "0.21.1", features = ["invocation"] }
 chrono = "0.4.42"
 clap = { version = "4.5", features = ["derive"] }
+tracing = "0.1"
 
 
 [dev-dependencies]

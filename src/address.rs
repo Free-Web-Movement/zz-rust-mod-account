@@ -232,10 +232,10 @@ impl FreeWebMovementAddress {
         let mnemonic: Mnemonic;
         if mnemonic_info.phrase.is_empty() {
             mnemonic =
-                Mnemonic::generate_in(mnemonic_info.language, mnemonic_info.word_count).unwrap();
+                Mnemonic::generate_in(mnemonic_info.language, mnemonic_info.word_count).expect("hardcoded mnemonic params");
         } else {
             mnemonic =
-                Mnemonic::parse_in(mnemonic_info.language, mnemonic_info.phrase.clone()).unwrap();
+                Mnemonic::parse_in(mnemonic_info.language, mnemonic_info.phrase.clone()).expect("hardcoded mnemonic params");
         }
 
         // 默认地址信息
@@ -256,13 +256,13 @@ impl FreeWebMovementAddress {
             &address_info.derivation_path,
             address_info.network,
         )
-        .unwrap();
+        .expect("hardcoded key operations");
         let address = FreeWebMovementAddress::key_to_inner_address(
             public_key,
             address_info.network,
             address_info.address_type,
         )
-        .unwrap();
+        .expect("hardcoded address params");
 
         FreeWebMovementAddress {
             info: address_info,
@@ -294,8 +294,8 @@ impl FreeWebMovementAddress {
     ) -> Result<Address, String> {
         let address = match address_type {
             AddressType::P2pkh => Address::p2pkh(&key, network),
-            AddressType::P2wpkh => Address::p2wpkh(&key, network).unwrap(),
-            AddressType::P2sh => Address::p2shwpkh(&key, network).unwrap(),
+            AddressType::P2wpkh => Address::p2wpkh(&key, network).expect("hardcoded address params"),
+            AddressType::P2sh => Address::p2shwpkh(&key, network).expect("hardcoded address params"),
             _ => {
                 return Err("Unsupported address type".to_string());
             }
@@ -320,28 +320,28 @@ impl FreeWebMovementAddress {
         let secp = Secp256k1::new();
         let secret = private_key.inner;
         let hash = Sha256::digest(msg);
-        let message = Message::from_digest_slice(&hash).unwrap();
+        let message = Message::from_digest_slice(&hash).expect("valid hash");
         secp.sign_ecdsa(&message, &secret)
     }
 
     pub fn verify_message(public_key: &PublicKey, msg: &[u8], signature: &Signature) -> bool {
         let secp = Secp256k1::new();
         let hash = Sha256::digest(msg);
-        let message = Message::from_digest_slice(&hash).unwrap();
+        let message = Message::from_digest_slice(&hash).expect("valid hash");
         secp.verify_ecdsa(&message, signature, &public_key.inner)
             .is_ok()
     }
 
     pub fn to_public_key(bytes: &Vec<u8>) -> PublicKey {
-        PublicKey::from_slice(&bytes).unwrap()
+        PublicKey::from_slice(&bytes).expect("valid public key bytes")
     }
 
     pub fn to_private_key(bytes: &Vec<u8>) -> PrivateKey {
-        PrivateKey::from_slice(&bytes, Network::Bitcoin).unwrap()
+        PrivateKey::from_slice(&bytes, Network::Bitcoin).expect("valid private key bytes")
     }
 
     pub fn to_signature(bytes: &Vec<u8>) -> Signature {
-        Signature::from_compact(&bytes).unwrap()
+        Signature::from_compact(&bytes).expect("valid signature bytes")
     }
 
     pub fn random() -> Self {

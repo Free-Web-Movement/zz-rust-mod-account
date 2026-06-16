@@ -126,7 +126,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_save<'a>(
     let address = get_address_mut(ptr);
 
     let binding = env.get_string(&path).expect("无法获取路径");
-    let path_str = binding.to_str().unwrap();
+    let path_str = binding.to_str().expect("Invalid UTF-8 in path");
     let pathbuf = if path_str.is_empty() {
         // 默认路径使用 app_data/zz_wallet.json
         let mut dir = dirs::data_dir().expect("无法获取 app_data");
@@ -160,7 +160,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_load<'a>(
     let address = get_address_mut(ptr);
 
     let binding = env.get_string(&path).expect("无法获取路径");
-    let path_str = binding.to_str().unwrap();
+    let path_str = binding.to_str().expect("Invalid UTF-8 in path");
     let pathbuf = if path_str.is_empty() {
         // 默认路径使用 app_data/zz_wallet.json
         let mut dir = dirs::data_dir().expect("无法获取 app_data");
@@ -187,7 +187,7 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_backup<'a>(
     let address = get_address_mut(ptr);
 
     let binding = env.get_string(&path).expect("无法获取路径");
-    let path_str = binding.to_str().unwrap();
+    let path_str = binding.to_str().expect("Invalid UTF-8 in path");
     let pathbuf = if path_str.is_empty() {
         // 默认路径 app_data/backup_YYYYMMDD_HHMMSS.json
         let mut dir = dirs::data_dir().expect("无法获取 app_data");
@@ -222,13 +222,13 @@ pub unsafe extern "system" fn Java_rs_zz_coin_Address_recovery<'a>(
     let address = get_address_mut(ptr);
 
     let binding = env.get_string(&path).expect("无法获取路径");
-    let path_str = binding.to_str().unwrap();
+    let path_str = binding.to_str().expect("Invalid UTF-8 in path");
     let pathbuf = if path_str.is_empty() {
         // 默认恢复使用 app_data 下最新的 backup_*.json
         let mut dir = dirs::data_dir().expect("无法获取 app_data");
         dir.push(""); // data_dir 本身就是目录
         let mut backups: Vec<PathBuf> = fs::read_dir(&dir)
-            .unwrap()
+            .expect("Failed to read backup directory")
             .filter_map(|entry| {
                 let entry = entry.ok()?;
                 let path = entry.path();

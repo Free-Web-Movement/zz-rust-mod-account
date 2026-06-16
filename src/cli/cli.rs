@@ -68,26 +68,34 @@ pub fn run_cli(cli: Cli) {
 
         Commands::Save { dir, file } => {
             let wallet = Wallet::new(dir.as_deref(), file.as_deref());
-            wallet.save().expect("save failed");
-            println!("saved: {}", wallet.to_absolute_path());
+            match wallet.save() {
+                Ok(_) => println!("saved: {}", wallet.to_absolute_path()),
+                Err(e) => tracing::error!("save failed: {}", e),
+            }
         }
 
         Commands::Load { dir, file } => {
             let mut wallet = Wallet::new(dir.as_deref(), file.as_deref());
-            wallet.load().expect("load failed");
-            println!("{}", wallet.address.to_string());
+            match wallet.load() {
+                Ok(_) => println!("{}", wallet.address.to_string()),
+                Err(e) => tracing::error!("load failed: {}", e),
+            }
         }
 
         Commands::Backup { path, dir, file } => {
             let wallet = Wallet::new(dir.as_deref(), file.as_deref());
-            let backup_path = wallet.backup(path.as_deref()).expect("backup failed");
-            println!("backup: {}", backup_path);
+            match wallet.backup(path.as_deref()) {
+                Ok(backup_path) => println!("backup: {}", backup_path),
+                Err(e) => tracing::error!("backup failed: {}", e),
+            }
         }
 
         Commands::Recovery { path, dir, file } => {
             let mut wallet = Wallet::new(dir.as_deref(), file.as_deref());
-            wallet.recovery(path.as_deref()).expect("recovery failed");
-            println!("{}", wallet.address.to_string());
+            match wallet.recovery(path.as_deref()) {
+                Ok(_) => println!("{}", wallet.address.to_string()),
+                Err(e) => tracing::error!("recovery failed: {}", e),
+            }
         }
 
         Commands::Repl => {

@@ -9,7 +9,7 @@ pub fn run_repl() {
 
     loop {
         print!("> ");
-        io::stdout().flush().unwrap();
+        let _ = io::stdout().flush();
 
         let mut line = String::new();
         if io::stdin().read_line(&mut line).is_err() {
@@ -27,25 +27,33 @@ pub fn run_repl() {
             }
 
             "save" => {
-                wallet.save().expect("save failed");
-                println!("saved");
+                match wallet.save() {
+                    Ok(_) => println!("saved"),
+                    Err(e) => tracing::error!("save failed: {}", e),
+                }
             }
 
             "load" => {
-                wallet.load().expect("load failed");
-                println!("{}", wallet.address.to_string());
+                match wallet.load() {
+                    Ok(_) => println!("{}", wallet.address.to_string()),
+                    Err(e) => tracing::error!("load failed: {}", e),
+                }
             }
 
             "backup" => {
                 let path = parts.get(1).map(|s| *s);
-                let p = wallet.backup(path).expect("backup failed");
-                println!("backup: {}", p);
+                match wallet.backup(path) {
+                    Ok(p) => println!("backup: {}", p),
+                    Err(e) => tracing::error!("backup failed: {}", e),
+                }
             }
 
             "recovery" => {
                 let path = parts.get(1).map(|s| *s);
-                wallet.recovery(path).expect("recovery failed");
-                println!("{}", wallet.address.to_string());
+                match wallet.recovery(path) {
+                    Ok(_) => println!("{}", wallet.address.to_string()),
+                    Err(e) => tracing::error!("recovery failed: {}", e),
+                }
             }
 
             "exit" | "quit" => {
