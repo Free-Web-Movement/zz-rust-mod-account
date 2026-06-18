@@ -231,11 +231,11 @@ impl FreeWebMovementAddress {
     pub fn new(mnemonic_info: MnemonicInfo, address_info_option: Option<AddressInfo>) -> Self {
         let mnemonic: Mnemonic;
         if mnemonic_info.phrase.is_empty() {
-            mnemonic =
-                Mnemonic::generate_in(mnemonic_info.language, mnemonic_info.word_count).expect("hardcoded mnemonic params");
+            mnemonic = Mnemonic::generate_in(mnemonic_info.language, mnemonic_info.word_count)
+                .expect("hardcoded mnemonic params");
         } else {
-            mnemonic =
-                Mnemonic::parse_in(mnemonic_info.language, mnemonic_info.phrase.clone()).expect("hardcoded mnemonic params");
+            mnemonic = Mnemonic::parse_in(mnemonic_info.language, mnemonic_info.phrase.clone())
+                .expect("hardcoded mnemonic params");
         }
 
         // 默认地址信息
@@ -294,8 +294,12 @@ impl FreeWebMovementAddress {
     ) -> Result<Address, String> {
         let address = match address_type {
             AddressType::P2pkh => Address::p2pkh(&key, network),
-            AddressType::P2wpkh => Address::p2wpkh(&key, network).expect("hardcoded address params"),
-            AddressType::P2sh => Address::p2shwpkh(&key, network).expect("hardcoded address params"),
+            AddressType::P2wpkh => {
+                Address::p2wpkh(&key, network).expect("hardcoded address params")
+            }
+            AddressType::P2sh => {
+                Address::p2shwpkh(&key, network).expect("hardcoded address params")
+            }
             _ => {
                 return Err("Unsupported address type".to_string());
             }

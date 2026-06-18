@@ -18,7 +18,9 @@ impl Wallet {
     pub fn new(directory: Option<&str>, filename: Option<&str>) -> Self {
         // 获取用户 AppData 目录（Windows / macOS / Linux）
         let mut dir = dirs::data_dir().unwrap_or_else(|| {
-            tracing::warn!("Cannot determine app data directory, falling back to current directory");
+            tracing::warn!(
+                "Cannot determine app data directory, falling back to current directory"
+            );
             PathBuf::from(".")
         });
 
@@ -63,8 +65,10 @@ impl Wallet {
         } else {
             let addr = FreeWebMovementAddress::random();
             let json = serde_json::to_string_pretty(&addr).expect("Failed to serialize wallet");
-            let mut file = std::fs::File::create(&wallet_file).expect("Failed to create wallet file");
-            file.write_all(json.as_bytes()).expect("Failed to write wallet file");
+            let mut file =
+                std::fs::File::create(&wallet_file).expect("Failed to create wallet file");
+            file.write_all(json.as_bytes())
+                .expect("Failed to write wallet file");
             addr
         };
 

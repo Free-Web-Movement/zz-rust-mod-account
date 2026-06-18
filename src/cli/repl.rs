@@ -26,19 +26,15 @@ pub fn run_repl() {
                 println!("{}", wallet.address.to_string());
             }
 
-            "save" => {
-                match wallet.save() {
-                    Ok(_) => println!("saved"),
-                    Err(e) => tracing::error!("save failed: {}", e),
-                }
-            }
+            "save" => match wallet.save() {
+                Ok(_) => println!("saved"),
+                Err(e) => tracing::error!("save failed: {}", e),
+            },
 
-            "load" => {
-                match wallet.load() {
-                    Ok(_) => println!("{}", wallet.address.to_string()),
-                    Err(e) => tracing::error!("load failed: {}", e),
-                }
-            }
+            "load" => match wallet.load() {
+                Ok(_) => println!("{}", wallet.address.to_string()),
+                Err(e) => tracing::error!("load failed: {}", e),
+            },
 
             "backup" => {
                 let path = parts.get(1).map(|s| *s);
